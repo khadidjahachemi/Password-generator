@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+        }
+        form {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 60px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+        }
+        input[type="number"] {
+            width: 80px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.3s ease;
+        }
+        #result.show {
+            opacity: 1;
+            transform: translateY(10px);
+        }
+    </style>
+</head>
+<body>
+    <h1>Password generator</h1>
+    <form id="passwordForm">
+        <label>Length : <input type="number" id="length" value="8" min="4"></label><br>
+        <label><input type="checkbox" id="digits" checked> Include numbers</label><br>
+        <label><input type="checkbox" id="specials" checked> Include special characters</label><br>
+        <button type="submit">Générer</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        // Animation du résultat
+        function showResult(message) {
+            const result = document.getElementById('result');
+            result.textContent = message;
+            result.classList.add('show');
+            setTimeout(() => {
+                result.classList.remove('show');
+            }, 3000); // Masque le résultat après 3 secondes
+        }
+
+        // Gestion du formulaire
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const length = document.getElementById('length').value;
+            const digits = document.getElementById('digits').checked;
+            const specials = document.getElementById('specials').checked;
+
+            const response = await fetch('/generate_password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ length: Number(length), digits, specials })
+            });
+
+            const data = await response.json();
+            showResult(`Password : ${data.password}`);
+        });
+
+        // Animation du bouton au clic
+        const button = document.querySelector('button');
+        button.addEventListener('mousedown', () => button.style.transform = 'scale(0.9)');
+        button.addEventListener('mouseup', () => button.style.transform = 'scale(1)');
+    </script>
+</body>
+</html>
+
